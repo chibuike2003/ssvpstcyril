@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | {{ member.fullname }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ssvp-blue: #1e40af;
+            --ssvp-accent: #3b82f6;
+            --bg-body: #f8fafc;
+            --sidebar-width: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body { background-color: var(--bg-body); display: flex; min-height: 100vh; color: #1e293b; overflow-x: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--ssvp-blue);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 2000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -1px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-links { list-style: none; margin-top: 20px; }
+
+        .nav-links li a {
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links li.active a, .nav-links li a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .month-item {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .month-item:hover { background: #e2e8f0; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #475569; }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-group input:focus { border-color: var(--ssvp-blue); ring: 2px solid #dbeafe; }
+
+        /* --- STATS & CARDS --- */
+        .top-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; gap: 20px; }
+        .user-badge { display: flex; align-items: center; gap: 12px; background: white; padding: 10px 20px; border-radius: 16px; border: 1px solid #e2e8f0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .card { background: white; padding: 24px; border-radius: 20px; display: flex; align-items: center; gap: 20px; border: 1px solid #e2e8f0; }
+
+        /* --- TABLE --- */
+        .table-container { background: white; padding: 24px; border-radius: 20px; border: 1px solid #e2e8f0; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        td { padding: 16px 12px; border-top: 1px solid #f1f5f9; font-size: 14px; }
+        .status { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+        
+        .receipt-link {
+            color: var(--ssvp-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- MOBILE FLOATING BUTTON --- */
+        .mobile-fab {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--ssvp-blue);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.4);
+            z-index: 3000;
+            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1500;
+            backdrop-filter: blur(2px);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 80px; }
+            .sidebar-header span, .nav-links li span { display: none; }
+            .main-content { margin-left: 80px; width: calc(100% - 80px); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+            .mobile-fab { display: flex; }
+            .sidebar-overlay.visible { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <button class="mobile-fab" onclick="toggleSidebar()">
+        <i class="fas fa-bars" id="fab-icon"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-dove"></i> <span>SSVP OKOTA</span>
+        </div>
+        <ul class="nav-links">
+            <li class="active"><a href="#"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a></li>
+            <li><a href="#"><i class="fas fa-heart"></i> <span>Welfare Cases</span></a></li>
+            <li><a href="#"><i class="fas fa-calendar-check"></i> <span>My Visitations</span></a></li>
+            <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user-circle"></i> <span>Profile Settings</span></a></li>
+            <hr style="margin: 20px; opacity: 0.1;">
+            <li><a href="/logout" style="color: #f87171;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="padding: 15px; margin-bottom: 20px; border-radius: 12px; background: {% if category == 'success' %}#dcfce7; color: #166534{% else %}#fee2e2; color: #991b1b{% endif %};">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <header class="top-header">
+            <div>
+                <h1 style="font-size: 26px; font-weight: 800; color: #0f172a;">Hello, {{ member.fullname }}!</h1>
+                <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Welcome back to your portal.</p>
+            </div>
+            <div class="user-badge">
+                <div style="height: 40px; width: 40px; background: #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #475569;">
+                    {{ member.fullname[0] }}
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card">
+                <div style="background: #eff6ff; color: #2563eb; width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px;">
+                    <i class="fas fa-user-tag"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800;">Member</h3>
+                    <p style="font-size: 12px; color: #64748b;">Current Rank</p>
+                </div>
+            </div>
+            <div class="card" onclick="openModal()" style="cursor: pointer; border: 2px dashed #cbd5e1; background: #f8fafc;">
+                <div style="background: #f0fdf4; color: #16a34a; width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px;">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800;">Pay Dues</h3>
+                    <p style="font-size: 12px; color: #64748b;">Submit New Receipt</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-weight: 800;">Payment History</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Months</th>
+                        <th>Amount</th>
+                        <th>Receipt</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in member.payments %}
+                    <tr>
+                        <td>{{ payment.payment_date }}</td>
+                        <td>{{ payment.months_paid }}</td>
+                        <td>₦{{ "{:,.2f}".format(payment.amount) }}</td>
+                        <td>
+                            {% if payment.receipt_filename %}
+                            <a href="{{ url_for('static', filename='uploads/receipts/' + payment.receipt_filename) }}" target="_blank" class="receipt-link">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            {% else %}
+                            <span style="color: #94a3b8; font-size: 12px;">No file</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status" style="background: {% if payment.status == 'Pending' %}#fef3c7; color:#92400e{% elif payment.status == 'Completed' %}#dcfce7; color:#166534{% else %}#fee2e2; color:#991b1b{% endif %};">
+                                {{ payment.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">No records yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-weight: 800; color: #0f172a; font-size: 20px;">Submit Monthly Dues</h2>
+                <i class="fas fa-times" onclick="closeModal()" style="cursor: pointer; color: #64748b;"></i>
+            </div>
+            
+            <form action="/submit-dues" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Total Amount Paid (₦)</label>
+                    <input type="number" name="amount" placeholder="e.g. 5000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Months</label>
+                    <div class="month-grid">
+                        {% for month in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                        <label class="month-item">
+                            <input type="checkbox" name="months" value="{{ month }}"> {{ month }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Transaction Reference / ID</label>
+                    <input type="text" name="reference" placeholder="Enter bank reference number" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Transaction Receipt</label>
+                    <div style="position: relative; border: 2px dashed #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; transition: 0.3s;" id="drop-zone">
+                        <input type="file" name="receipt_file" id="receipt_file" accept="image/*,.pdf" required 
+                               style="position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;">
+                        <div id="upload-placeholder">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: var(--ssvp-blue); margin-bottom: 8px;"></i>
+                            <p style="font-size: 12px; color: #64748b;">Click to upload receipt<br><b>JPG, PNG or PDF</b></p>
+                        </div>
+                        <div id="file-preview" style="display: none; align-items: center; justify-content: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                            <span id="file-name" style="font-size: 13px; font-weight: 600; color: #1e293b;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="button" onclick="closeModal()" style="flex: 1; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; font-weight: 600; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--ssvp-blue); color: white; font-weight: 700; cursor: pointer;">Submit Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('visible');
+        }
+
+        function openModal() {
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            // Reset upload UI
+            document.getElementById('upload-placeholder').style.display = 'block';
+            document.getElementById('file-preview').style.display = 'none';
+        }
+
+        // File selection UI feedback
+        document.getElementById('receipt_file').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                document.getElementById('upload-placeholder').style.display = 'none';
+                document.getElementById('file-preview').style.display = 'flex';
+                document.getElementById('file-name').textContent = fileName;
+                document.getElementById('drop-zone').style.borderColor = 'var(--ssvp-blue)';
+            }
+        });
+
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('paymentModal')) closeModal();
+        }
+    </script>
+</body>
+</html>

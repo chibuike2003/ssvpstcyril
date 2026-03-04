@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin | Secure Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --super-navy: #0f172a;
+            --accent-gold: #f59e0b;
+            --primary-blue: #3b82f6;
+            --text-light: #f8fafc;
+            --input-bg: #ffffff;
+            --border-soft: #e2e8f0;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            background-image: radial-gradient(circle at top right, #e2e8f0, transparent),
+                              radial-gradient(circle at bottom left, #e2e8f0, transparent);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Sidebar Branding */
+        .sidebar {
+            background: var(--super-navy);
+            width: 35%;
+            padding: 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--accent-gold);
+        }
+
+        .sidebar-content p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-gold);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        /* Form Area */
+        .form-area {
+            flex: 1;
+            padding: 50px;
+            background: #fff;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 24px;
+            color: var(--super-navy);
+        }
+
+        /* Flash Messages */
+        .flash-msg {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .flash-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .flash-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--super-navy);
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-super {
+            grid-column: span 2;
+            background: var(--super-navy);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-super:hover {
+            background: #1e293b;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .login-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 900px) {
+            .auth-card { flex-direction: column; }
+            .sidebar { width: 100%; padding: 30px; }
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .btn-super { grid-column: span 1; }
+            .form-area { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <div class="sidebar">
+        <div>
+            <span class="badge">Root Access</span>
+            <h1>Super Admin</h1>
+            <div class="sidebar-content">
+                <p>You are initializing the master administrative account. This profile grants unrestricted access to system configurations, user management, and global security protocols.</p>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <p style="font-size: 12px; color: #475569;">&copy; 2026 Enterprise Systems Inc.</p>
+        </div>
+    </div>
+
+    <div class="form-area">
+        <div class="form-header">
+            <h2>Create Profile</h2>
+            <p style="color: #94a3b8; font-size: 14px;">Please provide official details for identity verification.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('super_register_submit') }}" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullname" placeholder="Johnathan Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="superadmin@corp.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Access Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Access Password</label>
+                    <input type="password" name="confirm_password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-super">Finalize Registration</button>
+            </div>
+        </form>
+
+        <div class="login-link">
+            Already have root access? <a href="{{ url_for('super_login') }}">Sign In</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

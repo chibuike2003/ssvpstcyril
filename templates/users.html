@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Account | SSVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+<div class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="p-8 md:p-12">
+            <div class="mb-10 text-center">
+                <h1 class="text-3xl font-bold text-slate-800">Create Account</h1>
+                <p class="text-slate-500 mt-2">Join the St. Cyril Okota Vincentian family.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="mb-6 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700 border border-red-200{% else %}bg-green-100 text-green-700 border border-green-200{% endif %}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="/signup" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Full Name</label>
+                    <input type="text" name="fullname" placeholder="John Doe" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Email Address</label>
+                    <input type="email" name="email" placeholder="name@example.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Phone Number</label>
+                    <input type="tel" name="phone" placeholder="080..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+              
+
+              
+              
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Password</label>
+                    <input type="password" name="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Confirm Password</label>
+                    <input type="password" name="confirm_password" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+
+                <div class="md:col-span-2 mt-4">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transition-all">
+                        Create Account
+                    </button>
+                    <p class="text-center text-sm text-slate-500 mt-6">
+                        Already have an account? <a href="/login" class="text-blue-600 font-semibold hover:underline">Log in</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
